@@ -46,7 +46,7 @@ def update_program(latest_version):
 
     # Get the name of the current branch
     current_branch = subprocess.check_output(['git', 'rev-parse', '--abbrev-ref', 'HEAD']).decode().strip()
-
+  
     # Stash any local changes so they don't interfere with the pull
     subprocess.check_call(['git', 'stash'])
 

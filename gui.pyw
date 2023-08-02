@@ -32,7 +32,7 @@ def main():
     # Verificar actualizaciones
     if verificar_actualizacion():
         respuesta = sg.popup_yes_no('Hay una nueva actualización disponible. ¿Deseas actualizar el programa?', title='Actualización disponible')
-        if respuesta == 'Yes':
+        if respuesta == 'Yes': 
             iniciar_actualizacion()
             # Reiniciar el programa
             os.execv(sys.executable, ['python'] + sys.argv)
@@ -48,13 +48,14 @@ def main():
             break
 
         # Verifica la existencia del archivo de señalización
-        if os.path.exists('signal.txt') or event == "Corregir ortografía":
+        if os.path.exists('corregir_ortografia.txt') or event == "Corregir ortografía":
             try:
                 sg.one_line_progress_meter('Corrección ortográfica', 20, 100, '↻ Procesando texto...', key="-PROG-",orientation='h')
+                acciones.corregir_ortografia()
                 sg.one_line_progress_meter_cancel(key="-PROG-")
-                if os.path.exists('signal.txt'):
-                    os.remove('signal.txt')
-                tray.show_message('Corrección ortográfica', '😁👍 ¡Texto corregido con éxito!')
+                if os.path.exists('corregir_ortografia.txt'):
+                    os.remove('corregir_ortografia.txt')
+                tray.show_message('Corrección ortográfica', '😁👍 ¡Texto corregido con éxito!\n\nPuedes 📄 pegarlo.')
             except Exception as e:  # Atrapar excepciones generales
                 tray.show_message('Corrección ortográfica', '❌ Ocurrió un error, reportar a 👨🏽 César:\n\n {}'.format(e))
                 logging.exception("Ocurrió un error al corregir la ortografía")
@@ -76,12 +77,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
-
-#TODO autoupdate
-    # en git
-    # tray show message vigilando cuando encuentre uno
-#TODO logging.basicConfig(filename='app.log', filemode='w', format='%(name)s - %(levelname)s - %(message)s')
-# preguntar por que es bueno que se reinicieqsiempre
-# mycompan.myrpoduct 
