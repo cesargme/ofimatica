@@ -15,7 +15,7 @@ def verificar_actualizacion():
     return latest_version != curr_version
 
 def iniciar_actualizacion():
-    # Placeholder: Aquí debes implementar la lógica para iniciar la actualización
+    updater.update_program(updater.get_latest_version())
     pass
 
 def main():
