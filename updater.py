@@ -4,7 +4,7 @@ import shutil
 import os
 
 def get_latest_version():
-    response = requests.get('https://api.github.com/repos/username/repo/tags')
+    response = requests.get('https://api.github.com/repos/cesargme/ofimatica/tags')
     response.raise_for_status()
     tags = response.json()
     if not tags:
@@ -24,6 +24,10 @@ def update_program():
     latest_version = get_latest_version()
     if latest_version != CURRENT_VERSION:
         print('Updating to version', latest_version)
-        url = 'https://github.com/username/repo/archive/refs/tags/' + latest_version + '.zip'
+        url = 'https://github.com/cesargme/ofimatica/archive/refs/tags/' + latest_version + '.zip'
         download_and_extract_zip(url)
         print('Update complete')
+
+def get_current_version():
+    with open('version.txt', 'r') as f:
+        return f.read().strip()

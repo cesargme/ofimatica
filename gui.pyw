@@ -4,13 +4,15 @@ import PySimpleGUI as sg
 from psgtray import SystemTray
 import acciones
 import logging
+import updater
 
 logging.basicConfig(filename='app.log', filemode='w', format='%(name)s - %(levelname)s - %(message)s')
 
 
 def verificar_actualizacion():
-    # Placeholder: Aquí debes implementar la lógica para verificar si hay una actualización
-    return False
+    latest_version = updater.get_latest_version()
+    curr_version = updater.get_current_version()
+    return latest_version != curr_version
 
 def iniciar_actualizacion():
     # Placeholder: Aquí debes implementar la lógica para iniciar la actualización
