@@ -1,11 +1,13 @@
 import openai
-
 import os
 
-# Leer la variable de entorno
-openai_api_key = os.environ.get('OPENAI_API_KEY')
+def set_api_key():
+    openai_api_key = os.getenv('OPENAI_API_KEY')
 
-openai.api_key = openai_api_key
+    if openai_api_key is None:
+        raise Exception("No se encontró la variable de entorno 'OPENAI_API_KEY'. Por favor informa a 👨🏽 César.")
+
+    openai.api_key = openai_api_key
 
 # list models
 models = openai.Model.list()
