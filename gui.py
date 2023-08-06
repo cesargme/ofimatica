@@ -100,3 +100,5 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+#TODO Reiniciar si es que hay una excepcion ( o poner en inicio app mia 
