@@ -17,9 +17,7 @@ logging.basicConfig(filename='app.log', filemode='w', format='%(name)s - %(level
 tray = None
 
 def verificar_actualizacion():
-    latest_version = updater.get_latest_version()
-    curr_version = updater.get_current_version()
-    return latest_version != curr_version
+    return updater.check_git_diff()
 
 def iniciar_actualizacion():
     updater.update_program(updater.get_latest_version())

@@ -69,3 +69,20 @@ def get_current_version():
             f.write(get_latest_version())
     with open('version.txt', 'r') as f:
         return f.read().strip()
+    
+import subprocess
+
+def check_git_diff():
+    try:
+        # Actualizar la referencia local de la rama main
+        subprocess.run(["git", "fetch", "origin", "main"], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+        # Obtener diferencias entre la rama local y remota
+        result = subprocess.run(["git", "diff", "main..origin/main"], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+        # Verificar si hay diferencias
+        return len(result.stdout) > 0
+
+    except subprocess.CalledProcessError:
+        print("Hubo un error al ejecutar los comandos de Git.")
+        return False

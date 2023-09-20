@@ -1,5 +1,6 @@
 import pyperclip
 import gpt
+from datetime import date
 
 def corregir_ortografia():
     # Captura el texto seleccionado
@@ -53,7 +54,7 @@ def pacpart_extraer_fechas_horas():
     texto = pyperclip.paste()  # Pega el texto copiado
 
     # Utiliza la API de GPT para corregir el texto
-    texto_corregido = gpt.prompt(f"""Dado el siguiente texto, por favor extrae todas las fechas y horas y preséntalas en el siguiente formato:
+    texto_corregido = gpt.prompt(f"""Dado el siguiente texto, por favor extrae todas las fechas y horas. Si encuentras palabras como "hoy", asume que se refieren a la fecha actual ({date.today()}) y preséntalas en el siguiente formato
 Fecha: [Fecha en formato DD-MM-AAAA]
 Inicia: [Hora de inicio en formato HH:MM am/pm]
 Finaliza: [Hora de finalización en formato HH:MM am/pm]
