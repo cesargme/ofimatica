@@ -56,7 +56,7 @@ def ejecutar_accion(accion_func, signal_file_name, process_title, progress_messa
 def run_application():
     global tray
 
-    menu = ['', ['Corregir ortografía', 'Notas de Reunion',"CIE-10", "PacPart: Extraer Fechas y Horas",  '⚙️ Abrir registro de errores', 'Salir']]
+    menu = ['', ['Corregir ortografía', 'Notas de Reunion',"CIE-10", "PacPart: Extraer Fechas y Horas", "Calcular Edad", '⚙️ Abrir registro de errores', 'Salir']]
     tooltip = 'Aplicación de corrección ortográfica'
 
     layout = [[sg.Text('Ofimatica')]]
@@ -92,6 +92,7 @@ def run_application():
             "notas_de_reunion": Path(temp_dir) / "notas_de_reunion.txt",
             "cie10" : Path(temp_dir) / "cie10.txt",
             "pac_part_extraer_fechas_horas" : Path(temp_dir) / "pac_part_extraer_fechas_horas.txt",
+            "calcular_edad" : Path(temp_dir) / "calcular_edad.txt",
         }
 
         curr_signal_file = signal_files['corregir_ortografia']
@@ -137,6 +138,18 @@ def run_application():
                 success_message="😁👍 ¡Fechas y horas extraídas con éxito!\n\nPuedes 📄 pegarlas en el formato deseado.",
                 error_message="❌ Ocurrió un error, reportar a 👨🏽 César:\n\n {}"
             )
+
+        curr_signal_file = signal_files['calcular_edad']
+        if curr_signal_file.exists() or event == "Calcular Edad":
+            ejecutar_accion(
+                accion_func=acciones.obtener_y_calcular_edad,
+                signal_file_name=curr_signal_file,
+                process_title="Cálculo de Edad",
+                progress_message="↻ Procesando fecha de nacimiento...",
+                success_message="😁👍 ¡Edad calculada con éxito!\n\nPuedes 📄 pegar el resultado.",
+                error_message="❌ Ocurrió un error, reportar a 👨🏽 César:\n\n {}"
+            )
+
 
 
         elif event == sg.EVENT_SYSTEM_TRAY_ICON_DOUBLE_CLICKED:
