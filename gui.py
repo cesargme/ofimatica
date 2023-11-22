@@ -23,6 +23,7 @@ def iniciar_actualizacion():
     updater.update_program(updater.get_latest_version())
     pass
 
+@acciones.clipboard_decorator
 def ejecutar_accion(accion_func, signal_file_name, process_title, progress_message, success_message, error_message):
 
     # Check if the signal file exists
