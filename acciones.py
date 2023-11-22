@@ -123,17 +123,17 @@ def obtener_y_calcular_edad(msg):
 def clipboard_decorator(func):
     def wrapper(*args, **kwargs):
         # Inicialización
-        time.sleep(3)
+        time.sleep(0.2)
         paperclip_cache = pyperclip.paste()
         keyboard.send("ctrl+c")
-        time.sleep(1)
+        time.sleep(0.2)
 
-        # Llama a la función decorada y obtiene el texto corregido
+        # Llama a la función decorada 
         func(*args, **kwargs)
 
         # Pega el texto corregido
         keyboard.send("ctrl+v")
-        time.sleep(1)
+        time.sleep(0.2)
 
         # Restaura el portapapeles original
         pyperclip.copy(paperclip_cache)
