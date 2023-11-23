@@ -7,17 +7,33 @@ import time
 import keyboard
 
 
-def corregir_ortografia():
 
-    texto_nuevo = pyperclip.paste()
+
+def obtener_desde_clipboard(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        texto = pyperclip.paste()  # Pega el texto copiado
+        resultado = func(
+            texto, *args, **kwargs
+        )  # Llama a la función original con el texto del portapapeles
+        pyperclip.copy(resultado)  # Copia el resultado al portapapeles
+        print(resultado)  # Imprime el resultado para depuración
+        return resultado
+
+    return wrapper
+
+
+
+@obtener_desde_clipboard
+def corregir_ortografia(texto = None):
 
     # corregir texto
     texto_corregido = gpt.prompt(
-        f"Corrige este texto con buena ortografía: {texto_nuevo}"
+        f"Texto original (speech to text): {texto}\ntexto arreglado con mejor ortografía y gramática: "
     )
-
-    pyperclip.copy(texto_corregido)
     print(texto_corregido)
+
+    return texto_corregido
 
 
 def notas_reunion():
@@ -47,7 +63,8 @@ def cie10():
     # Utiliza la API de GPT para corregir el texto
     texto_corregido = gpt.prompt(
         f"""Dada la siguiente lista de diagnósticos, por favor devuelve únicamente los códigos CIE-10 correspondientes:
-{texto}"""
+texto: {texto}
+códigos: """
     )
 
     # Reemplaza el texto seleccionado con el texto corregido
@@ -64,10 +81,11 @@ def pacpart_extraer_fechas_horas():
     texto_corregido = gpt.prompt(
         f"""Dado el siguiente texto, por favor extrae todas las fechas y horas. Si encuentras palabras como "hoy", asume que se refieren a la fecha actual ({date.today()}) y preséntalas en el siguiente formato
 Fecha: [Fecha en formato DD-MM-AAAA]
-Inicia: [Hora de inicio en formato HH:MM am/pm]
-Finaliza: [Hora de finalización en formato HH:MM am/pm]
+Hora de inicio: [Hora de inicio en formato HH:MM am/pm]
+Hora de fin: [Hora de finalización en formato HH:MM am/pm]
 
-{texto}"""
+texto: {texto}
+extracción: """
     )
 
     # Reemplaza el texto seleccionado con el texto corregido
@@ -75,21 +93,6 @@ Finaliza: [Hora de finalización en formato HH:MM am/pm]
 
     # Imprime el texto corregido en la consola para depuración
     print(texto_corregido)
-
-
-def obtener_desde_clipboard(func):
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        texto = pyperclip.paste()  # Pega el texto copiado
-        resultado = func(
-            texto, *args, **kwargs
-        )  # Llama a la función original con el texto del portapapeles
-        pyperclip.copy(resultado)  # Copia el resultado al portapapeles
-        print(resultado)  # Imprime el resultado para depuración
-        return resultado
-
-    return wrapper
-
 
 @obtener_desde_clipboard
 def obtener_y_calcular_edad(msg):
@@ -140,3 +143,8 @@ def clipboard_decorator(func):
 
     return wrapper
 
+
+if __name__ == "__main__":
+    import PySimpleGUI as sg
+    res = corregir_ortografia("me preocupa un poco su capacidad de soporte, como los otros percheros que hemos tenido.")
+    sg.popup(res)
