@@ -31,7 +31,7 @@ def corregir_ortografia(texto = None):
 
     # corregir texto
     texto_corregido = gpt.prompt(
-        f"Texto original (speech to text): {texto}\ntexto arreglado con mejor ortografía y gramática: "
+        f"Texto original (speech to text): {texto}\ntexto arreglado con mejor ortografía: "
     )
     print(texto_corregido)
 
@@ -128,17 +128,17 @@ def obtener_y_calcular_edad(msg):
 def clipboard_decorator(func):
     def wrapper(*args, **kwargs):
         # Inicialización
-        time.sleep(0.2)
+        time.sleep(0.8)
         paperclip_cache = pyperclip.paste()
         keyboard.send("ctrl+c")
-        time.sleep(0.2)
+        time.sleep(0.8)
 
         # Llama a la función decorada 
         func(*args, **kwargs)
 
         # Pega el texto corregido
         keyboard.send("ctrl+v")
-        time.sleep(0.2)
+        time.sleep(0.8)
 
         # Restaura el portapapeles original
         pyperclip.copy(paperclip_cache)

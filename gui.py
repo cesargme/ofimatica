@@ -8,6 +8,14 @@ import updater
 import gpt
 import tempfile
 from pathlib import Path
+import keyboard
+import queue
+
+event_queue = queue.Queue()
+
+def handle_hotkey(accion):
+    event_queue.put(accion)
+
 
 temp_dir = tempfile.gettempdir()  # Retorna el directorio temporal
 
@@ -29,14 +37,13 @@ def iniciar_actualizacion():
 
 
 class Accion:
-    def __init__(
-        self, nombre, archivo_signal, funcion, mensajes, usar_clipboard_decorator=False
-    ):
+    def __init__(self, nombre, archivo_signal, funcion, mensajes, usar_clipboard_decorator=False, hotkey=None):
         self.nombre = nombre
         self.archivo_signal = Path(temp_dir) / archivo_signal
         self.funcion = funcion
         self.mensajes = mensajes
         self.usar_clipboard_decorator = usar_clipboard_decorator
+        self.hotkey = hotkey  # Tecla rápida opcional
 
     def intentar_ejecutar(self, event):
         if self.usar_clipboard_decorator:
@@ -44,7 +51,7 @@ class Accion:
         else:
             self.funcion_decorada = self.ejecutar
 
-        if self.archivo_signal.exists() or event == self.nombre:
+        if self.archivo_signal.exists() or event == self.nombre or (self.hotkey and event == self.hotkey):
             self.funcion_decorada()
 
     def ejecutar(self):
@@ -70,6 +77,7 @@ class Accion:
             sg.one_line_progress_meter_cancel(key="-PROG-")
 
 
+
 acciones_lista = [
     Accion(
         "Corregir ortografía",
@@ -82,6 +90,7 @@ acciones_lista = [
             "error": "❌ Ocurrió un error, reportar a 👨🏽 César:\n\n {,}"
         },
         usar_clipboard_decorator=True,
+        hotkey='ctrl+l',
     ),
     Accion(
         "Notas de Reunion",
@@ -156,10 +165,10 @@ def run_application():
 
     tooltip = "Aplicación de corrección ortográfica"
 
-    layout = [[sg.Text("Ofimatica")]]
+    layout = [[sg.Text("Ofimática")]]
 
     window = sg.Window(
-        "Ofimatica", layout, finalize=True, enable_close_attempted_event=True
+        "Ofimática", layout, finalize=True, enable_close_attempted_event=True
     )
     window.hide()
 
@@ -184,7 +193,19 @@ def run_application():
             # Reiniciar el programa
             os.execv(sys.executable, ["python"] + sys.argv)
 
+    # Configuración de hotkeys para las acciones
+    for accion in acciones_lista:
+        if accion.hotkey:
+            keyboard.add_hotkey(accion.hotkey, lambda accion=accion: handle_hotkey(accion))
+
     while True:
+
+        try:
+            accion = event_queue.get_nowait()  # Intenta obtener un evento de la cola
+            accion.intentar_ejecutar(accion.nombre)
+        except queue.Empty:
+            pass  # No hay eventos en la cola
+
         event, values = window.read(timeout=100)
 
         # Si es un evento de la bandeja del sistema, cambia el evento a lo que la bandeja envió
@@ -209,6 +230,11 @@ def run_application():
 
     tray.close()
     window.close()
+
+    # Remover hotkeys cuando la aplicación se cierre
+    for accion in acciones_lista:
+        if accion.hotkey:
+            keyboard.remove_hotkey(accion.hotkey)
 
 
 def main():
