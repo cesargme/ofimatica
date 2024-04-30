@@ -16,8 +16,9 @@ event_queue = queue.Queue()
 def handle_hotkey(accion):
     event_queue.put(accion)
 
-
-temp_dir = tempfile.gettempdir()  # Retorna el directorio temporal
+SIGNAL_FILES_DIR = os.path.expanduser('~/ofimatica/signals')
+if not os.path.exists(SIGNAL_FILES_DIR):
+    os.makedirs(SIGNAL_FILES_DIR)
 
 logging.basicConfig(
     filename="app.log", filemode="w", format="%(name)s - %(levelname)s - %(message)s"
@@ -39,15 +40,15 @@ def iniciar_actualizacion():
 class Accion:
     def __init__(self, nombre, archivo_signal, funcion, mensajes, usar_clipboard_decorator=False, hotkey=None):
         self.nombre = nombre
-        self.archivo_signal = Path(temp_dir) / archivo_signal
+        self.archivo_signal = Path(SIGNAL_FILES_DIR) / archivo_signal
         self.funcion = funcion
         self.mensajes = mensajes
         self.usar_clipboard_decorator = usar_clipboard_decorator
         self.hotkey = hotkey  # Tecla rápida opcional
 
-    def intentar_ejecutar(self, event):
+    def intentar_ejecutar(self, event, delay):
         if self.usar_clipboard_decorator:
-            self.funcion_decorada = acciones_todas.clipboard_decorator(self.ejecutar)
+            self.funcion_decorada = acciones_todas.clipboard_decorator(self.ejecutar, delay)
         else:
             self.funcion_decorada = self.ejecutar
 
@@ -90,7 +91,6 @@ acciones_lista = [
             "error": "❌ Ocurrió un error, reportar a 👨🏽 César:\n\n {,}"
         },
         usar_clipboard_decorator=True,
-        hotkey='ctrl+l',
     ),
     Accion(
         "Notas de Reunion",
@@ -199,10 +199,9 @@ def run_application():
             keyboard.add_hotkey(accion.hotkey, lambda accion=accion: handle_hotkey(accion))
 
     while True:
-
         try:
             accion = event_queue.get_nowait()  # Intenta obtener un evento de la cola
-            accion.intentar_ejecutar(accion.nombre)
+            accion.intentar_ejecutar(accion.nombre, delay=5)
         except queue.Empty:
             pass  # No hay eventos en la cola
 
@@ -216,7 +215,9 @@ def run_application():
             break
 
         for accion in acciones_lista:
-            accion.intentar_ejecutar(event)
+            if event in [accion.nombre] or Path(accion.archivo_signal).exists():
+                delay = 0.8 if Path(accion.archivo_signal).exists() else 5
+                accion.intentar_ejecutar(event, delay=delay)
 
         if event == sg.EVENT_SYSTEM_TRAY_ICON_DOUBLE_CLICKED:
             window.un_hide()

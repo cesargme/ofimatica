@@ -125,10 +125,11 @@ def obtener_y_calcular_edad(msg):
     return f"Edad: {edad_actual} Años"
 
 
-def clipboard_decorator(func):
+def clipboard_decorator(func, delay):
     def wrapper(*args, **kwargs):
         # Inicialización
-        time.sleep(0.8)
+        time.sleep(delay)
+
         paperclip_cache = pyperclip.paste()
         keyboard.send("ctrl+c")
         time.sleep(0.8)
