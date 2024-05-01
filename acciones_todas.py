@@ -31,7 +31,7 @@ def corregir_ortografia(texto = None):
 
     # corregir texto
     texto_corregido = gpt.prompt(
-        f"Texto original (speech to text): {texto}\ntexto arreglado con mejor ortografía: "
+        f"Texto original (speech to text): {texto}\ntexto con mejor ortografía y ligeramente arreglado(con extrema prudencia): "
     )
     print(texto_corregido)
 
@@ -136,6 +136,7 @@ def clipboard_decorator(func, delay):
 
         # Llama a la función decorada 
         func(*args, **kwargs)
+        time.sleep(0.8)
 
         # Pega el texto corregido
         keyboard.send("ctrl+v")
