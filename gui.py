@@ -177,7 +177,7 @@ def run_application():
         single_click_events=False,
         window=window,
         tooltip=tooltip,
-        icon="icono.ico",
+        icon="buho.ico",
     )
 
     gpt.set_api_key()  # Llama a set_api_key()
