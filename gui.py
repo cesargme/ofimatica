@@ -6,10 +6,10 @@ import acciones_todas
 import logging
 import updater
 import gpt
-import tempfile
 from pathlib import Path
 import keyboard
 import queue
+import pygetwindow as gw
 
 event_queue = queue.Queue()
 
@@ -57,6 +57,7 @@ class Accion:
 
     def ejecutar(self):
         curr_signal_file = Path(self.archivo_signal)
+        active_window_before = gw.getActiveWindow()  # Almacena la ventana activa antes de iniciar el medidor de progreso
         try:
             sg.one_line_progress_meter(
                 self.mensajes["titulo"],
@@ -65,9 +66,15 @@ class Accion:
                 self.mensajes["progreso"],
                 key="-PROG-",
                 orientation="h",
+                keep_on_top=True,
+                no_titlebar=False,
+                no_button=True,
             )
+            # Ejecuta la función asignada
             self.funcion()
             sg.one_line_progress_meter_cancel(key="-PROG-")
+            if active_window_before:  # Verifica si se ha almacenado una ventana
+                active_window_before.activate()  # Restaura el foco a la ventana original
             if curr_signal_file.exists():
                 curr_signal_file.unlink()
             tray.show_message(self.mensajes["titulo"], self.mensajes["exito"])
@@ -76,7 +83,8 @@ class Accion:
             logging.exception("Error during action execution")
         finally:
             sg.one_line_progress_meter_cancel(key="-PROG-")
-
+            if active_window_before:  # Verifica de nuevo por si acaso
+                active_window_before.activate()  # Restaura el foco a la ventana original
 
 
 acciones_lista = [
@@ -87,7 +95,7 @@ acciones_lista = [
         {
             "titulo": "Corrección ortográfica",
             "progreso": "↻ Procesando texto...",
-            "exito": "😁👍 ¡Texto corregido con éxito!\n\nPuedes 📄 pegarlo.",
+            "exito": "😁👍 ¡Texto corregido con éxito!",
             "error": "❌ Ocurrió un error, reportar a 👨🏽 César:\n\n {,}"
         },
         usar_clipboard_decorator=True,
