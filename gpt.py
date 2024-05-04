@@ -1,4 +1,5 @@
 import openai
+from openai import OpenAI
 import os
 
 def set_api_key():
@@ -9,21 +10,19 @@ def set_api_key():
 
     openai.api_key = openai_api_key
 
-# list models
-models = openai.Model.list()
-
-# print the first model's id
-print(models.data[0].id)
-
-
 def prompt(msg):
-    # create a completion
-    completion = openai.Completion.create(
-        model="gpt-3.5-turbo-instruct", 
-        prompt=msg, 
-        max_tokens=512
+
+    client = OpenAI()
+
+    chat_completion = client.chat.completions.create(
+        messages=[
+            {
+                "role": "user",
+                "content": msg,
+            }
+        ],
+        model="gpt-4-turbo",
     )
 
-    # print the completion
-    return completion.choices[0].text
+    return chat_completion.choices[0].message.content
 
