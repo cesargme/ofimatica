@@ -101,18 +101,6 @@ acciones_lista = [
         usar_clipboard_decorator=True,
     ),
     Accion(
-        "Notas de Reunion",
-        "notas_de_reunion.txt",
-        acciones_todas.notas_reunion,
-        {
-            "titulo": "📄 Notas de Reunion",
-            "progreso": "↻ Procesando texto...",
-            "exito": "😁👍 ¡Se han hecho las notas de reunion con éxito!\n\nPuedes 📄 pegarlo.",
-            "error": "❌ Ocurrió un error, reportar a 👨🏽 César:\n\n {,}"
-        },
-        usar_clipboard_decorator=True,
-    ),
-    Accion(
         "CIE-10",
         "cie10.txt",
         acciones_todas.cie10,
