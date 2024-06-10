@@ -1,6 +1,7 @@
 import openai
 from openai import OpenAI
 import os
+import base64
 
 def set_api_key():
     openai_api_key = os.getenv('OPENAI_API_KEY')
@@ -25,4 +26,39 @@ def prompt(msg):
     )
 
     return chat_completion.choices[0].message.content
+
+
+def encode_image(image_path):
+    with open(image_path, "rb") as image_file:
+        return base64.b64encode(image_file.read()).decode("utf-8")
+
+
+
+def prompt_with_image(msg, image_path):
+    client = OpenAI()
+
+    base64_image = encode_image(image_path)
+
+    chat_completion = client.chat.completions.create(
+        messages=[
+            {
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": msg},
+                {"type": "image_url", "image_url": {
+                    "url": f"data:image/jpg;base64,{base64_image}"}
+                }]
+                
+            }
+        ],
+        model="gpt-4o",
+    )
+
+    return chat_completion.choices[0].message.content
+
+# Uso del script
+if __name__ == "__main__":
+    set_api_key()
+    response = prompt_with_image("Describe the attached image.", "cesar.jpg")
+    print(response)
 
