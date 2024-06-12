@@ -82,9 +82,3 @@ def transcribir_y_unificar_chunks(carpeta_chunks, archivo_unificado):
     with open(archivo_unificado, "w") as archivo_final:
         for transcripcion in transcripciones:
             archivo_final.write(transcripcion + "\n")
-
-# Ejemplo de uso
-if __name__ == "__main__":
-    carpeta_chunks = "chunks_audio"
-    archivo_unificado = "transcripcion_unificada.txt"
-    transcribir_y_unificar_chunks(carpeta_chunks, archivo_unificado)
