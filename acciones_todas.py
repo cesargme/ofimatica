@@ -9,6 +9,7 @@ import PySimpleGUI as sg
 from pdf2image import convert_from_path
 import os
 import subprocess
+import myclipboard_util
 
 
 def obtener_desde_clipboard(func):
@@ -25,9 +26,8 @@ def obtener_desde_clipboard(func):
     return wrapper
 
 
-
 @obtener_desde_clipboard
-def corregir_ortografia(texto = None):
+def corregir_ortografia(texto=None):
 
     # corregir texto
     texto_corregido = gpt.prompt(
@@ -36,6 +36,22 @@ def corregir_ortografia(texto = None):
     print(texto_corregido)
 
     return texto_corregido
+
+
+def extraer_info_transaccion_financiera(texto=None):
+    # Leer el contenido del archivo prompt_transaccion.txt
+    with open("prompt_transaccion.txt", "r") as archivo:
+        prompt = archivo.read().strip()
+
+    respuesta = gpt.prompt_with_image(
+        prompt,
+        myclipboard_util.get_base64_image_from_clipboard(),
+    )
+
+    clipboard = myclipboard_util.copy_data_to_excel_clipboard(respuesta)
+    print(clipboard)
+
+    return clipboard
 
 
 def notas_reunion():
@@ -96,6 +112,7 @@ extracción: """
     # Imprime el texto corregido en la consola para depuración
     print(texto_corregido)
 
+
 @obtener_desde_clipboard
 def obtener_y_calcular_edad(msg):
     def calcular_edad(fecha_nacimiento):
@@ -134,7 +151,7 @@ def clipboard_decorator(func, delay):
         keyboard.send("ctrl+c")
         time.sleep(0.8)
 
-        # Llama a la función decorada 
+        # Llama a la función decorada
         func(*args, **kwargs)
         time.sleep(0.8)
 
@@ -148,46 +165,48 @@ def clipboard_decorator(func, delay):
     return wrapper
 
 
-
-
 def convertir_pdf_a_png():
     # Crear un diálogo para seleccionar el archivo PDF
     layout = [
-        [sg.Text('Seleccione un archivo PDF para convertir a PNG')],
+        [sg.Text("Seleccione un archivo PDF para convertir a PNG")],
         [sg.Input(), sg.FileBrowse(file_types=(("PDF Files", "*.pdf"),))],
-        [sg.Button('Convertir'), sg.Button('Cancelar')]
+        [sg.Button("Convertir"), sg.Button("Cancelar")],
     ]
 
-    window = sg.Window('Convertidor PDF a PNG', layout)
+    window = sg.Window("Convertidor PDF a PNG", layout)
 
     while True:
         event, values = window.read()
 
-        if event in (sg.WIN_CLOSED, 'Cancelar'):
+        if event in (sg.WIN_CLOSED, "Cancelar"):
             break
 
-        if event == 'Convertir':
+        if event == "Convertir":
             pdf_path = values[0]
             if pdf_path and os.path.exists(pdf_path):
                 # Procesar el archivo PDF
                 images = convert_from_path(pdf_path)
-                output_folder = os.path.join(os.path.dirname(pdf_path), os.path.splitext(os.path.basename(pdf_path))[0] + '_images')
+                output_folder = os.path.join(
+                    os.path.dirname(pdf_path),
+                    os.path.splitext(os.path.basename(pdf_path))[0] + "_images",
+                )
                 os.makedirs(output_folder, exist_ok=True)
 
                 for i, image in enumerate(images):
-                    image_path = os.path.join(output_folder, f'page_{i + 1}.png')
-                    image.save(image_path, 'PNG')
+                    image_path = os.path.join(output_folder, f"page_{i + 1}.png")
+                    image.save(image_path, "PNG")
 
                 # Abrir la carpeta de salida
-                subprocess.Popen(f'explorer {os.path.realpath(output_folder)}')
+                subprocess.Popen(f"explorer {os.path.realpath(output_folder)}")
             break
 
     window.close()
 
 
-
-
 if __name__ == "__main__":
     import PySimpleGUI as sg
-    res = corregir_ortografia("me preocupa un poco su capacidad de soporte, como los otros percheros que hemos tenido.")
+
+    res = corregir_ortografia(
+        "me preocupa un poco su capacidad de soporte, como los otros percheros que hemos tenido."
+    )
     sg.popup(res)

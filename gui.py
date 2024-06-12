@@ -89,6 +89,18 @@ class Accion:
 
 acciones_lista = [
     Accion(
+        "Extraer info de transacción financiera",
+        "transaccion.txt",
+        acciones_todas.extraer_info_transaccion_financiera,
+        {
+            "titulo": "Extrayendo info de imagen financiera",
+            "progreso": "↻ Procesando texto...",
+            "exito": "😁👍 Listo! Puedes pegarlo en Excel",
+            "error": "❌ Ocurrió un error, reportar a 👨🏽 César:\n\n {,}"
+        },
+        usar_clipboard_decorator=False,
+    ),
+    Accion(
         "Corregir ortografía",
         "corregir_ortografia.txt",
         acciones_todas.corregir_ortografia,
@@ -249,3 +261,4 @@ if __name__ == "__main__":
     main()
 
 # TODO Reiniciar si es que hay una excepcion ( o poner en inicio app mia
+# TODO ver por qué hay excepccion al usar el extractor de imagen info financiera

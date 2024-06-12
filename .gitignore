@@ -160,3 +160,4 @@ cython_debug/
 #.idea/
 
 version.txt
+prompt_transaccion.txt

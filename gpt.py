@@ -33,11 +33,8 @@ def encode_image(image_path):
         return base64.b64encode(image_file.read()).decode("utf-8")
 
 
-
-def prompt_with_image(msg, image_path):
+def prompt_with_image(msg, base64_image):
     client = OpenAI()
-
-    base64_image = encode_image(image_path)
 
     chat_completion = client.chat.completions.create(
         messages=[
@@ -56,9 +53,7 @@ def prompt_with_image(msg, image_path):
 
     return chat_completion.choices[0].message.content
 
-# Uso del script
-if __name__ == "__main__":
-    set_api_key()
-    response = prompt_with_image("Describe the attached image.", "cesar.jpg")
-    print(response)
 
+#TODO
+# crear accion pa mi
+# TODO optimizar costos con el uso de assistant, threads y files
