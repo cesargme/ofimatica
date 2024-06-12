@@ -54,6 +54,37 @@ def prompt_with_image(msg, base64_image):
     return chat_completion.choices[0].message.content
 
 
-#TODO
-# crear accion pa mi
-# TODO optimizar costos con el uso de assistant, threads y files
+def get_transcription(audio_file):
+    client = OpenAI()
+
+    transcription = client.audio.transcriptions.create(
+        model="whisper-1", 
+        file=audio_file
+    )
+    return transcription.text
+
+def transcribir_y_unificar_chunks(carpeta_chunks, archivo_unificado):
+    transcripciones = []
+
+    # Iterar sobre los archivos de audio en la carpeta
+    for archivo in sorted(os.listdir(carpeta_chunks)):
+        if archivo.endswith(".mp3"):
+            ruta_audio = os.path.join(carpeta_chunks, archivo)
+            with open(ruta_audio, "rb") as audio_file:
+                transcripcion = get_transcription(audio_file)
+                # Guardar la transcripción en un archivo .txt separado
+                archivo_txt = ruta_audio.replace(".mp3", ".txt")
+                with open(archivo_txt, "w") as f:
+                    f.write(transcripcion)
+                transcripciones.append(transcripcion)
+
+    # Unificar todas las transcripciones en un único archivo .txt
+    with open(archivo_unificado, "w") as archivo_final:
+        for transcripcion in transcripciones:
+            archivo_final.write(transcripcion + "\n")
+
+# Ejemplo de uso
+if __name__ == "__main__":
+    carpeta_chunks = "chunks_audio"
+    archivo_unificado = "transcripcion_unificada.txt"
+    transcribir_y_unificar_chunks(carpeta_chunks, archivo_unificado)

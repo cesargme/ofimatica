@@ -10,6 +10,7 @@ from pdf2image import convert_from_path
 import os
 import subprocess
 import myclipboard_util
+import audio_processing
 
 
 def obtener_desde_clipboard(func):
@@ -52,6 +53,11 @@ def extraer_info_transaccion_financiera(texto=None):
     print(clipboard)
 
     return clipboard
+
+def transcribir_reunión(ruta_mkv):
+    audio_processing.convertir_mkv_a_mp3(ruta_mkv, "temp_audio.mp3")
+    audio_processing.dividir_audio_en_chunks("temp_audio.mp3", duracion_minutos=10, carpeta_salida="reu")
+    gpt.transcribir_y_unificar_chunks("reu","reu.txt")
 
 
 def notas_reunion():
