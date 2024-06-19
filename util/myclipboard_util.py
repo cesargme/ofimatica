@@ -1,7 +1,6 @@
 from PIL import ImageGrab
 import base64
 from io import BytesIO
-import pandas as pd
 import pyperclip
 import json
 import easyocr
@@ -46,6 +45,9 @@ def save_image_from_clipboard(file_path):
 
 
 def copy_data_to_excel_clipboard(json_str):
+
+    import pandas as pd
+
     '''
     Copia los datos de una cadena JSON al portapapeles en un formato adecuado para pegar en Excel.
     
