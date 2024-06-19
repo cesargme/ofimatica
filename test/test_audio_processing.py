@@ -1,6 +1,6 @@
 import os
 import pytest
-from audio_processing import convertir_mkv_a_mp3, dividir_audio_en_chunks
+from util.audio_processing import convertir_mkv_a_mp3, dividir_audio_en_chunks
 
 def test_convertir_mkv_a_mp3():
     ruta_mkv = "longvideo_test.mkv"

@@ -6,6 +6,8 @@ import pandas as pd
 import pyperclip
 import json
 import easyocr
+import sys
+
 
 def get_base64_image_from_clipboard():
     try:
@@ -28,6 +30,7 @@ def get_base64_image_from_clipboard():
     except Exception as e:
         return str(e)
 
+
 def save_image_from_clipboard(file_path):
     try:
         # Obtener la imagen del portapapeles
@@ -42,6 +45,7 @@ def save_image_from_clipboard(file_path):
     except Exception as e:
         print(f"Error al guardar la imagen: {e}")
 
+
 def show_image_from_base64(base64_image):
     try:
         # Decodificar la imagen base64
@@ -55,22 +59,36 @@ def show_image_from_base64(base64_image):
     except Exception as e:
         print("Error al mostrar la imagen:", e)
 
+
 def copy_data_to_excel_clipboard(json_str):
+    '''
+    Copia los datos de una cadena JSON al portapapeles en un formato adecuado para pegar en Excel.
+    
+    Args:
+    json_str (str): Cadena JSON que representa uno o más diccionarios. 
+                    Puede ser una lista de diccionarios o un solo diccionario.
 
-    # Ejemplo de uso
-    # json_str = """[
-    #     {"Fecha": "2024-06-01", "Cuánto": 100.50, "Motivo": "Pago servicio", "Tarjeta": "BBVA, soles", "Transferencia": "VERDADERO"},
-    #     {"Fecha": "2024-06-02", "Cuánto": 50.00, "Motivo": "", "Tarjeta": "Pichincha", "Transferencia": "FALSO"},
-    #     {"Fecha": "2024-06-03", "Cuánto": 75.75, "Motivo": "para pagar a junta", "Tarjeta": "BN", "Transferencia": "VERDADERO"}
-    # ]"""
-
-
-    # Parsear la cadena JSON a una lista de diccionarios
+    Ejemplo de uso:
+    json_str = """[
+        {"Fecha": "2024-06-01", "Cuánto": 100.50, "Motivo": "Pago servicio", "Tarjeta": "BBVA, soles", "Transferencia": "VERDADERO"},
+        {"Fecha": "2024-06-02", "Cuánto": 50.00, "Motivo": "", "Tarjeta": "Pichincha", "Transferencia": "FALSO"},
+        {"Fecha": "2024-06-03", "Cuánto": 75.75, "Motivo": "para pagar a junta", "Tarjeta": "BN", "Transferencia": "VERDADERO"}
+    ]"""
+    copy_data_to_excel_clipboard(json_str)
+    
+    json_str = """{"Fecha": "2024-06-01", "Cuánto": 100.50, "Motivo": "Pago servicio", "Tarjeta": "BBVA, soles", "Transferencia": "VERDADERO"}"""
+    copy_data_to_excel_clipboard(json_str)
+    '''
+    # Parsear la cadena JSON
     try:
         data = json.loads(json_str)
     except json.JSONDecodeError as e:
         print(f"Error al parsear JSON: {e}")
         return
+
+    # Si la entrada es un diccionario en lugar de una lista de diccionarios, convertirlo a una lista de un solo elemento
+    if isinstance(data, dict):
+        data = [data]
 
     # Convertir la lista de diccionarios en un DataFrame
     df = pd.DataFrame(data)
@@ -87,22 +105,28 @@ def copy_data_to_excel_clipboard(json_str):
     print("La tabla ha sido copiada al portapapeles en formato adecuado para Excel.")
     print(array_of_arrays)
 
-# Cambiar la codificación de la consola a UTF-8
-import sys
-sys.stdout.reconfigure(encoding='utf-8')
 
-# Crear un objeto lector de OCR
-reader = easyocr.Reader(['es'])
+def ocr_from_clipboard_image():
+    try:
+        # Cambiar la codificación de la consola a UTF-8
+        sys.stdout.reconfigure(encoding='utf-8')
 
-# Guardar la imagen del portapapeles en temp.jpg
-save_image_from_clipboard("temp.jpg")
+        # Crear un objeto lector de OCR
+        reader = easyocr.Reader(['es'])
 
-# Leer texto de la imagen
-result = reader.readtext("temp.jpg")
+        # Guardar la imagen del portapapeles en temp.jpg
+        save_image_from_clipboard("temp.jpg")
 
-# Imprimir el texto extraído
-for detection in result:
-    print(detection[1])
+        # Leer texto de la imagen
+        result = reader.readtext("temp.jpg")
 
-# Cambiar la codificación de la consola de vuelta a cp1252 (opcional)
-sys.stdout.reconfigure(encoding='cp1252')
+        # Extraer el texto del resultado
+        extracted_text = "\n".join([detection[1] for detection in result])
+
+        return extracted_text
+    finally:
+        # Cambiar la codificación de la consola de vuelta a cp1252 (opcional)
+        sys.stdout.reconfigure(encoding='cp1252')
+
+
+# TODO extraer funcion para poner este codigo suelto

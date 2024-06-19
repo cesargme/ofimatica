@@ -1,5 +1,5 @@
 import pyperclip
-import gpt
+import util.gpt as gpt
 from datetime import date, datetime
 from functools import wraps
 import re
@@ -9,9 +9,35 @@ import PySimpleGUI as sg
 from pdf2image import convert_from_path
 import os
 import subprocess
-import myclipboard_util
-import audio_processing
+import util.myclipboard_util as myclipboard_util
+import util.audio_processing as audio_processing
+import util.my_ollama as my_ollama
+from pathlib import Path
 
+
+def seleccionar_archivo_mkv(func):
+    def wrapper(*args, **kwargs):
+        layout = [
+            [sg.Text("Selecciona el archivo .mkv")],
+            [sg.Input(), sg.FileBrowse(file_types=(("MKV Files", "*.mkv"),))],
+            [sg.OK(), sg.Cancel()]
+        ]
+
+        window = sg.Window("Seleccionar Archivo", layout)
+        
+        event, values = window.read()
+        window.close()
+
+        if event == "OK":
+            ruta_mkv = values[0]
+            if ruta_mkv.endswith('.mkv'):
+                return func(ruta_mkv, *args, **kwargs)
+            else:
+                sg.popup_error("Debe seleccionar un archivo .mkv")
+        else:
+            sg.popup("Operación cancelada")
+    
+    return wrapper
 
 def obtener_desde_clipboard(func):
     @wraps(func)
@@ -41,23 +67,27 @@ def corregir_ortografia(texto=None):
 
 def extraer_info_transaccion_financiera(texto=None):
     # Leer el contenido del archivo prompt_transaccion.txt
-    with open("prompt_transaccion.txt", "r") as archivo:
+    with open("prompts/prompt_transaccion.txt", "r") as archivo:
         prompt = archivo.read().strip()
 
-    respuesta = gpt.prompt_with_image(
-        prompt,
-        myclipboard_util.get_base64_image_from_clipboard(),
-    )
+    
+    ocrd_image = myclipboard_util.ocr_from_clipboard_image()
+
+    respuesta = my_ollama.prompt(prompt + ocrd_image, serve=True)
 
     clipboard = myclipboard_util.copy_data_to_excel_clipboard(respuesta)
     print(clipboard)
 
     return clipboard
 
+@seleccionar_archivo_mkv #TODO, que sea en el mismo explorador, seleccionándolo ahí mismito
 def transcribir_reunión(ruta_mkv):
-    audio_processing.convertir_mkv_a_mp3(ruta_mkv, "temp_audio.mp3")
+    ruta_mkv_str= ruta_mkv
+    ruta_mkv = Path(ruta_mkv)
+
+    audio_processing.convertir_mkv_a_mp3(ruta_mkv_str, "temp_audio.mp3")
     audio_processing.dividir_audio_en_chunks("temp_audio.mp3", duracion_minutos=10, carpeta_salida="reu")
-    gpt.transcribir_y_unificar_chunks("reu","reu.txt")
+    gpt.transcribir_y_unificar_chunks("reu",ruta_mkv.parent / (ruta_mkv.stem + ".txt") )
 
 
 def notas_reunion():

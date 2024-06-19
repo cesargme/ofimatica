@@ -5,7 +5,7 @@ from psgtray import SystemTray
 import acciones_todas
 import logging
 import updater
-import gpt
+import util.gpt as gpt
 from pathlib import Path
 import keyboard
 import queue
@@ -88,6 +88,19 @@ class Accion:
 
 
 acciones_lista = [
+
+    Accion(
+        "Transcribir Reunión",
+        "trans_reu.txt",
+        acciones_todas.transcribir_reunión,
+        {
+            "titulo": "Transcribiendo reunión",
+            "progreso": "↻ Procesando video...",
+            "exito": "😁👍 Listo! La transcripción está en la misma carpeta del video",
+            "error": "❌ Ocurrió un error, reportar a 👨🏽 César:\n\n {,}"
+        },
+        usar_clipboard_decorator=False,
+    ),
     Accion(
         "Extraer info de transacción financiera",
         "transaccion.txt",
