@@ -1,7 +1,6 @@
-from PIL import ImageGrab, Image
+from PIL import ImageGrab
 import base64
 from io import BytesIO
-import matplotlib.pyplot as plt
 import pandas as pd
 import pyperclip
 import json
@@ -44,20 +43,6 @@ def save_image_from_clipboard(file_path):
         image.save(file_path, format="JPEG")
     except Exception as e:
         print(f"Error al guardar la imagen: {e}")
-
-
-def show_image_from_base64(base64_image):
-    try:
-        # Decodificar la imagen base64
-        image_bytes = base64.b64decode(base64_image)
-        image = Image.open(BytesIO(image_bytes))
-
-        # Mostrar la imagen usando matplotlib
-        plt.imshow(image)
-        plt.axis("off")  # Ocultar los ejes
-        plt.show()
-    except Exception as e:
-        print("Error al mostrar la imagen:", e)
 
 
 def copy_data_to_excel_clipboard(json_str):
