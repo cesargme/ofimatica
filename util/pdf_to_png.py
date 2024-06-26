@@ -1,4 +1,4 @@
-import PySimpleGUI as sg
+import FreeSimpleGUI as sg
 from psgtray import SystemTray
 from pdf2image import convert_from_path
 import os

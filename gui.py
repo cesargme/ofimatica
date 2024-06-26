@@ -1,6 +1,6 @@
 import os
 import sys
-import PySimpleGUI as sg
+import FreeSimpleGUI as sg
 from psgtray import SystemTray
 import acciones_todas
 import logging

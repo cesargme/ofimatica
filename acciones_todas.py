@@ -5,7 +5,7 @@ from functools import wraps
 import re
 import time
 import keyboard
-import PySimpleGUI as sg
+import FreeSimpleGUI as sg
 from pdf2image import convert_from_path
 import os
 import subprocess
@@ -240,7 +240,7 @@ def convertir_pdf_a_png():
 
 
 if __name__ == "__main__":
-    import PySimpleGUI as sg
+    import FreeSimpleGUI as sg
 
     res = corregir_ortografia(
         "me preocupa un poco su capacidad de soporte, como los otros percheros que hemos tenido."
