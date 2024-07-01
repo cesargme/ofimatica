@@ -38,13 +38,14 @@ def iniciar_actualizacion():
 
 
 class Accion:
-    def __init__(self, nombre, archivo_signal, funcion, mensajes, usar_clipboard_decorator=False, hotkey=None):
+    def __init__(self, nombre, archivo_signal, funcion, mensajes, usar_clipboard_decorator=False, hotkey=None, sin_popup_progreso=False):
         self.nombre = nombre
         self.archivo_signal = Path(SIGNAL_FILES_DIR) / archivo_signal
         self.funcion = funcion
         self.mensajes = mensajes
         self.usar_clipboard_decorator = usar_clipboard_decorator
         self.hotkey = hotkey  # Tecla rápida opcional
+        self.sin_popup_progreso = sin_popup_progreso
 
     def intentar_ejecutar(self, event, delay):
         if self.usar_clipboard_decorator:
@@ -59,20 +60,22 @@ class Accion:
         curr_signal_file = Path(self.archivo_signal)
         active_window_before = gw.getActiveWindow()  # Almacena la ventana activa antes de iniciar el medidor de progreso
         try:
-            sg.one_line_progress_meter(
-                self.mensajes["titulo"],
-                20,
-                100,
-                self.mensajes["progreso"],
-                key="-PROG-",
-                orientation="h",
-                keep_on_top=True,
-                no_titlebar=False,
-                no_button=True,
-            )
+            if not self.sin_popup_progreso:
+                sg.one_line_progress_meter(
+                    self.mensajes["titulo"],
+                    20,
+                    100,
+                    self.mensajes["progreso"],
+                    key="-PROG-",
+                    orientation="h",
+                    keep_on_top=True,
+                    no_titlebar=False,
+                    no_button=True,
+                )
             # Ejecuta la función asignada
             self.funcion()
-            sg.one_line_progress_meter_cancel(key="-PROG-")
+            if not self.sin_popup_progreso:
+                sg.one_line_progress_meter_cancel(key="-PROG-")
             if active_window_before:  # Verifica si se ha almacenado una ventana
                 active_window_before.activate()  # Restaura el foco a la ventana original
             if curr_signal_file.exists():
@@ -88,6 +91,20 @@ class Accion:
 
 
 acciones_lista = [
+
+    Accion(
+        "Líneas WS",
+        "lineas_ws.txt",
+        acciones_todas.enviar_ws_encuesta_lineas,
+        {
+            "titulo": "Copiando Líneas WS encuesta",
+            "progreso": "↻ Copiando Líneas WS encuesta...",
+            "exito": "😁👍 Listo!",
+            "error": "❌ Ocurrió un error, reportar a 👨🏽 César:\n\n {,}"
+        },
+        usar_clipboard_decorator=False,
+        sin_popup_progreso=True,
+    ),
 
     Accion(
         "Transcribir Reunión",
